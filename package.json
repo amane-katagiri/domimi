@@ -1,0 +1,22 @@
+{
+  "name": "domimi",
+  "version": "0.0.1",
+  "description": "smart contract chastity server",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/amane-katagiri/domimi.git"
+  },
+  "author": "Amane Katagiri",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/amane-katagiri/domimi/issues"
+  },
+  "homepage": "https://github.com/amane-katagiri/domimi#readme",
+  "dependencies": {
+    "web3": "^1.5.3"
+  }
+}
