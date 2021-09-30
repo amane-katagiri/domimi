@@ -8,3 +8,11 @@ services:
     image: 'remixproject/remix-ide'
     ports:
       - '8080:80'
+  domimi-server:
+    image: 'node:14-alpine'
+    volumes:
+      - './server:/app'
+    working_dir: '/app'
+    command: 'node main.js'
+    ports:
+      - '3000:3000'
