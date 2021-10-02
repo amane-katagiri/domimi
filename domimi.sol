@@ -45,6 +45,15 @@ contract Domimi {
     function isUnderManagement() public view returns(bool) {
         return m.master != owner;
     }
+    function getExpiration() public view returns(uint) {
+        return m.start.add(m.period);
+    }
+    function getOwner() public view returns(address) {
+        return owner;
+    }
+    function getMaster() public view returns(address) {
+        return m.master;
+    }
     function isOnPeriod() internal view returns(bool) {
         return m.start <= block.timestamp && block.timestamp <= m.start.add(m.period);
     }
