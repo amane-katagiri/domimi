@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>domimi</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <link rel='stylesheet' href='/main.css'>
+  <script>
+  function updateContractAddress() {
+    document.getElementById("master").href = "/master/#" + document.getElementById("contract").value;
+    document.getElementById("owner").href = "/owner/#" + document.getElementById("contract").value;
+  }
+  window.addEventListener('load', function() {
+    updateContractAddress();
+  });
+  </script>
+</head>
+<body>
+  <h1>domimi</h1>
+  <label>コントラクトのアドレス: <input id='contract' type='text' placeholder='0x...' onchange='updateContractAddress()'></label>
+  <ul>
+    <li><a id="master" href="/master/">管理者としてログイン</a></li>
+    <li><a id="owner" href="/owner/">被管理者としてログイン</a></li>
+  <ul>
+</body>
+</html>

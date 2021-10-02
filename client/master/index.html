@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>domimi - 管理者ページ</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <link rel='stylesheet' href='/main.css'>
+  <script src='https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.5.3/dist/web3.min.js'></script>
+  <script src='/main.js'></script>
+  <script>
+  const GAS = 300000;
+
+  let contract;
+  let master;
+  window.addEventListener('load', function() {
+    web3.eth.getAccounts().then(function(coinbase) {
+      master = coinbase[5];
+      const contractAddress = location.hash.substring(1);
+      if (/^0x[a-fA-F0-9]{40}$/.test(contractAddress)) {
+        writeLog('init', 'master address: ' + master);
+        contract = new web3.eth.Contract(abi, location.hash.substring(1));
+        document.getElementById('generateSignature').disabled = false;
+        document.getElementById('checkBalance').disabled = false;
+        document.getElementById('checkDeposit').disabled = false;
+        document.getElementById('checkLocked').disabled = false;
+        document.getElementById('extendPeriod').disabled = false;
+        document.getElementById('exit').disabled = false;
+        document.getElementById('withdraw').disabled = false;
+        if (window.crypto.getRandomValues) {
+          let nonce = new Uint32Array(1);
+          window.crypto.getRandomValues(nonce);
+          document.getElementById('nonce').value = nonce[0];
+        }
+        writeLog('init', 'your contract address: ' + contractAddress);
+        checkBalance(master);
+        checkLocked(contract);
+      } else {
+        writeLog('init', 'master address: ' + master);
+        writeError('init', 'bad contract address: ' + contractAddress);
+      }
+    }).catch(function(e) {
+      writeError('init', e);
+    })
+  });
+
+  function _generateSignature() {
+    document.getElementById('signature').value = generateSignature(
+      contract,
+      master,
+      document.getElementById('period').value,
+      document.getElementById('initialCost').value,
+      document.getElementById('abortCost').value,
+      document.getElementById('execCost').value,
+      document.getElementById('maxExtent').value,
+      document.getElementById('minBalance').value,
+      document.getElementById('nonce').value,
+    );
+  }
+</script>
+</head>
+<body>
+  <details class='panel'>
+    <summary>管理を開始する</summary>
+    <label>秘密鍵: <input id='privkey' type='text' placeholder='0x...'></label>
+    <label>管理期間（秒）: <input id='period' type='number' value='100'></label>
+    <label>管理開始費（wei）: <input id='initialCost' type='number' value='1000000000000000000'></label>
+    <label>管理中止費（wei）: <input id='abortCost' type='number' value='10000000000000000000'></label>
+    <label>管理手数料（wei）: <input id='execCost' type='number' value='100000000000000000'></label>
+    <label>最大延長期間（秒）/回: <input id='maxExtent' type='number' value='100'></label>
+    <label>開始時点の最小残高（wei）: <input id='minBalance' type='number' value='2000000000000000000'></label>
+    <label>nonce: <input id='nonce' type='number'></label>
+    <button disabled id='generateSignature' onclick='_generateSignature()'>署名生成</button>
+    <textarea readonly id='signature'></textarea>
+  </details>
+  <div class='panel'>
+    <button disabled id='checkBalance' onclick='checkBalance(master)'>残高確認</button>
+    <button disabled id='checkDeposit' onclick='checkDeposit()'>保証金確認</button>
+    <button disabled id='checkLocked' onclick='checkLocked(contract)'>ロック確認</button>
+    <button disabled id='withdraw' onclick='withdraw(contract, master, GAS, master)'>管理費の引き出し</button>
+  </div>
+  <div class='panel'>
+    <button disabled id='extendPeriod' onclick='extendPeriod(contract, master, GAS, 100)'>100秒延長</button>
+    <button disabled id='exit' onclick='exit(contract, master, GAS)'>管理終了</button>
+  </div>
+  <div id='console'></div>
+</body>
+</html>

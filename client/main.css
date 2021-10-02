@@ -1,0 +1,25 @@
+body {
+  margin: 2em;
+}
+.panel {
+  margin: 0 auto;
+  margin-bottom: 1em;
+  max-width: 480px;
+}
+input, textarea {
+  width: 100%;
+}
+textarea {
+  height: 10em;
+  resize: vertical;
+}
+input[type="number"] {
+  text-align: right;
+}
+label {
+  display: block;
+  margin-bottom: 1em;
+}
+#console div {
+  margin-bottom: 1em;
+}

@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  <meta charset='UTF-8'>
+  <meta http-equiv='X-UA-Compatible' content='IE=edge'>
+  <title>domimi - 被管理者ページ</title>
+  <meta name='viewport' content='width=device-width, initial-scale=1.0'>
+  <link rel='stylesheet' href='/main.css'>
+  <script src='https://cdn.jsdelivr.net/gh/ethereum/web3.js@1.5.3/dist/web3.min.js'></script>
+  <script src='/main.js'></script>
+  <script>
+  const GAS = 300000;
+
+  let contract;
+  let owner;
+  window.addEventListener('load', function() {
+    web3.eth.getAccounts().then(function(coinbase) {
+      owner = coinbase[0];
+      const contractAddress = location.hash.substring(1);
+      if (/^0x[a-fA-F0-9]{40}$/.test(contractAddress)) {
+        writeLog('init', 'owner address: ' + owner);
+        contract = new web3.eth.Contract(abi, location.hash.substring(1));
+        document.getElementById('start').disabled = false;
+        document.getElementById('checkBalance').disabled = false;
+        document.getElementById('checkDeposit').disabled = false;
+        document.getElementById('checkLocked').disabled = false;
+        document.getElementById('extendPeriod').disabled = false;
+        document.getElementById('exit').disabled = false;
+        document.getElementById('abort').disabled = false;
+        document.getElementById('refund').disabled = false;
+        document.getElementById('send').disabled = false;
+        document.getElementById('withdraw').disabled = false;
+        document.getElementById('tribute').disabled = false;
+        writeLog('init', 'your contract address: ' + contractAddress);
+        getMaster(contract).then(function(master) {
+          if (master !== owner) {
+            document.getElementById('receiver').value = master;
+          }
+        }).catch(function(e) {
+          writeError('init', 'failed to get master: ' + e);
+        });
+        checkBalance(owner);
+        checkLocked(contract);
+      } else {
+        writeLog('init', 'owner address: ' + owner);
+        writeError('init', 'bad contract address: ' + contractAddress);
+      }
+    }).catch(function(e) {
+      writeError('init', e);
+    })
+  });
+
+  function _start() {
+    const signature = JSON.parse(document.getElementById('signature').value);
+    start(
+      contract, owner, GAS,
+      signature.master,
+      signature.period,
+      signature.initialCost,
+      signature.abortCost,
+      signature.execCost,
+      signature.maxExtent,
+      signature.minBalance,
+      signature.nonce,
+      signature.signature
+    );
+  }
+  function _withdraw() {
+    const master = document.getElementById('receiver').value;
+    if (!master) {
+      writeError('withdraw', 'set address');
+      return;
+    }
+    withdraw(contract, owner, GAS, master);
+  }
+  function tribute() {
+    const master = document.getElementById('receiver').value;
+    getMaster(contract).then(function(_master) {
+      if (!master) {
+        writeError('tribute', 'set address');
+        return;
+      }
+      if (master === _master || confirm('現在の管理者と異なりますがよろしいですか？')) {
+        send(owner, master, '100000000000000000');
+      }
+    }).catch(function(e) {
+      writeError('tribute', e);
+    });
+  }
+</script>
+</head>
+<body>
+  <details class='panel'>
+    <summary>管理を開始する</summary>
+    <label>管理者の署名: <textarea id='signature' type='text'></textarea></label>
+    <button disabled id='start' onclick='_start()'>管理開始</button>
+  </details>
+  <details class='panel'>
+    <summary>管理者に送金する</summary>
+    <label>宛先: <input id='receiver' type='text' placeholder='0x...'></label>
+    <button disabled id='withdraw' onclick='_withdraw()'>管理費を送金</button>
+    <button disabled id='tribute' onclick='tribute(owner, master, "100000000000000000")'>直接 0.1 ETH を送金</button>
+  </details>
+  <div class='panel'>
+    <button disabled id='checkBalance' onclick='checkBalance(owner)'>残高確認</button>
+    <button disabled id='checkDeposit' onclick='checkDeposit()'>保証金確認</button>
+    <button disabled id='checkLocked' onclick='checkLocked(contract)'>ロック確認</button>
+    <button disabled id='refund' onclick='refund(contract, owner, GAS)'>払い戻し</button>
+  </div>
+  <div class='panel'>
+    <button disabled id='extendPeriod' onclick='extendPeriod(contract, owner, GAS, 100)'>100秒延長</button>
+    <button disabled id='exit' onclick='exit(contract, owner, GAS)'>管理終了</button>
+    <button disabled id='abort' onclick='abort(contract, owner, GAS)'>管理中止</button>
+    <button disabled id='send' onclick='send(owner, contract.options.address, "1000000000000000000")'>1 ETH 預け入れ</button>
+  </div>
+  <div id='console'></div>
+</body>
+</html>

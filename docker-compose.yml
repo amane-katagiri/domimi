@@ -20,5 +20,11 @@ services:
       - '3000:3000'
     networks:
       - domimi
+  domimi-client:
+    image: 'nginx:alpine'
+    volumes:
+      - './client:/usr/share/nginx/html:ro'
+    ports:
+      - '8000:80'
 networks:
   domimi:
