@@ -4,6 +4,8 @@ services:
     image: 'trufflesuite/ganache-cli'
     ports:
       - '8545:8545'
+    networks:
+      - domimi
   remix:
     image: 'remixproject/remix-ide'
     ports:
@@ -16,3 +18,7 @@ services:
     command: 'node main.js'
     ports:
       - '3000:3000'
+    networks:
+      - domimi
+networks:
+  domimi:

@@ -2,7 +2,7 @@ const Web3 = require('web3');
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const web3 = new Web3(new Web3.providers.HttpProvider('http://localhost:8545'));
+const web3 = new Web3(new Web3.providers.HttpProvider('http://ganache:8545'));
 const app = express();
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
