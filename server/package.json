@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/amane-katagiri/domimi#readme",
   "dependencies": {
-    "web3": "^1.5.3"
+    "web3": "^1.8.2"
   }
 }
